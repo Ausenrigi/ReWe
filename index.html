@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReWe Buchungssatz-Übungen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'Inter','Segoe UI',sans-serif;
+  background:#f5f5f5;
+  color:#1a1a1a;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── Top stripe ── */
+.topbar { background:#6264a7; height:5px; flex-shrink:0; }
+
+/* ── App shell ── */
+.app-shell { display:flex; flex:1; min-height:0; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width:260px;
+  flex-shrink:0;
+  background:#fff;
+  border-right:1px solid #e0e0e0;
+  display:flex;
+  flex-direction:column;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow-y:auto;
+}
+.sidebar-header {
+  padding:20px 16px 14px;
+  border-bottom:1px solid #e8e8e8;
+}
+.sidebar-logo {
+  font-size:.8rem;
+  font-weight:700;
+  color:#6264a7;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin-bottom:2px;
+}
+.sidebar-subtitle { font-size:.75rem; color:#888; }
+
+.nav-section-label {
+  font-size:.68rem;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#aaa;
+  padding:14px 16px 4px;
+}
+.nav-item {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 16px;
+  cursor:pointer;
+  border-left:3px solid transparent;
+  transition:background .12s, border-color .12s;
+  text-decoration:none;
+  color:#333;
+}
+.nav-item:hover { background:#f5f5fc; }
+.nav-item.active { background:#f0f0fb; border-left-color:#6264a7; color:#6264a7; font-weight:500; }
+.nav-item-icon {
+  width:28px; height:28px;
+  border-radius:4px;
+  background:#f0f0fb;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.75rem;
+  font-weight:700;
+  color:#6264a7;
+  flex-shrink:0;
+}
+.nav-item.active .nav-item-icon { background:#6264a7; color:#fff; }
+.nav-item-label { font-size:.85rem; line-height:1.3; }
+.nav-item-sub { font-size:.72rem; color:#aaa; margin-top:1px; }
+.nav-item.active .nav-item-sub { color:#9090c8; }
+
+.nav-progress {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 16px 10px;
+  font-size:.72rem;
+  color:#aaa;
+}
+.nav-prog-bar { flex:1; height:3px; background:#e8e8e8; border-radius:2px; }
+.nav-prog-fill { height:3px; background:#6264a7; border-radius:2px; transition:width .3s; }
+
+/* ── Main area ── */
+.main-area { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+
+.page-header {
+  background:#fff;
+  border-bottom:1px solid #e0e0e0;
+  flex-shrink:0;
+}
+.header-inner { padding:24px 28px 0; }
+.header-title { font-size:1.3rem; font-weight:600; margin-bottom:5px; }
+.header-sub { font-size:.85rem; color:#555; margin-bottom:18px; line-height:1.55; }
+.header-sub code { background:#f3f3f3; padding:1px 6px; border-radius:3px; font-size:.78rem; }
+.progress-track { height:4px; background:#e8e8e8; }
+.progress-fill  { height:4px; background:#6264a7; transition:width .4s ease; }
+
+.page-body { padding:20px 28px 80px; max-width:760px; }
+
+/* ── Section label ── */
+.section-label {
+  font-size:.7rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+  color:#6264a7; margin:20px 0 8px; padding-bottom:5px;
+  border-bottom:2px solid #6264a7;
+}
+
+/* ── Question card ── */
+.q-card {
+  background:#fff;
+  border:1px solid #e0e0e0;
+  border-left:4px solid #e0e0e0;
+  border-radius:4px;
+  padding:18px 18px 18px 16px;
+  margin-bottom:8px;
+}
+.q-card.active { border-left-color:#6264a7; }
+.q-card.ok     { border-left-color:#107c10; }
+.q-card.wrong  { border-left-color:#d13438; }
+
+.q-top  { display:flex; gap:12px; align-items:flex-start; }
+.q-num  {
+  width:26px; height:26px; border-radius:50%;
+  background:#e0e0e0; color:#555;
+  font-size:.72rem; font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; margin-top:1px;
+}
+.q-card.active .q-num { background:#6264a7; color:#fff; }
+.q-card.ok     .q-num { background:#107c10; color:#fff; }
+.q-card.wrong  .q-num { background:#d13438; color:#fff; }
+
+.q-body  { flex:1; }
+.q-meta  { display:flex; gap:7px; align-items:center; margin-bottom:5px; flex-wrap:wrap; }
+.q-beleg { font-size:.7rem; font-weight:600; color:#6264a7; text-transform:uppercase; letter-spacing:.05em; }
+.q-date  { font-size:.7rem; background:#f3f3f3; color:#555; padding:1px 7px; border-radius:2px; }
+.q-text  { font-size:.9rem; line-height:1.6; color:#1a1a1a; }
+
+/* ── Inputs ── */
+.input-wrap { margin-top:10px; }
+.input-hint { font-size:.75rem; color:#777; margin-bottom:5px; }
+.input-hint code { background:#f3f3f3; padding:1px 5px; border-radius:3px; font-size:.73rem; }
+
+.line-input {
+  width:100%; padding:9px 12px;
+  font-size:.875rem; font-family:'Courier New',monospace;
+  border:1px solid #c8c8c8; border-radius:2px; outline:none;
+  color:#1a1a1a; transition:border-color .15s, box-shadow .15s;
+}
+.line-input:focus { border-color:#6264a7; box-shadow:0 0 0 2px rgba(98,100,167,.15); }
+.line-input:disabled { background:#f7f7f7; color:#444; }
+.line-input.input-err { border-color:#d13438; box-shadow:0 0 0 2px rgba(209,52,56,.12); }
+
+.num-input {
+  width:200px; padding:9px 12px;
+  font-size:.875rem; font-family:'Courier New',monospace;
+  border:1px solid #c8c8c8; border-radius:2px; outline:none;
+  transition:border-color .15s;
+}
+.num-input:focus { border-color:#6264a7; box-shadow:0 0 0 2px rgba(98,100,167,.15); }
+.num-input:disabled { background:#f7f7f7; }
+.num-hint { font-size:.75rem; color:#888; margin-top:5px; }
+
+.mc-list { display:flex; flex-direction:column; gap:6px; margin-top:10px; }
+.mc-opt {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 12px; border:1px solid #c8c8c8; border-radius:2px;
+  cursor:pointer; font-size:.88rem; transition:background .1s, border-color .1s;
+  user-select:none;
+}
+.mc-opt:hover { background:#f5f5fc; border-color:#6264a7; }
+.mc-opt.sel   { background:#f0f0fb; border-color:#6264a7; }
+.mc-opt.reveal-ok    { background:#e8f5e8; border-color:#107c10; color:#107c10; font-weight:500; }
+.mc-opt.reveal-wrong { background:#fde8e8; border-color:#d13438; color:#d13438; }
+.mc-opt input[type=radio] { accent-color:#6264a7; width:15px; height:15px; flex-shrink:0; cursor:pointer; }
+.mc-list.mono .mc-opt { font-family:'Courier New',monospace; font-size:.78rem; }
+
+/* ── Feedback ── */
+.feedback { margin-top:10px; padding:9px 12px; border-radius:2px; font-size:.84rem; line-height:1.5; display:none; }
+.feedback.show { display:block; }
+.feedback.ok  { background:#e8f5e8; border:1px solid #107c10; color:#107c10; }
+.feedback.err { background:#fde8e8; border:1px solid #d13438; color:#d13438; }
+.feedback-correct {
+  margin-top:5px; font-family:'Courier New',monospace; font-size:.8rem;
+  color:#1a1a1a; background:rgba(0,0,0,.05); padding:5px 8px; border-radius:2px;
+}
+
+/* ── Buttons ── */
+.q-actions { margin-top:12px; display:flex; gap:8px; align-items:center; }
+.btn {
+  padding:7px 18px; border-radius:2px; border:1px solid transparent;
+  font-size:.875rem; font-weight:500; cursor:pointer; font-family:inherit;
+  transition:background .12s;
+}
+.btn-primary { background:#6264a7; color:#fff; border-color:#6264a7; }
+.btn-primary:hover { background:#4f5192; }
+
+.locked-note { margin-top:10px; font-size:.78rem; color:#bbb; font-style:italic; }
+
+/* ── Score ── */
+.score-card {
+  display:none; background:#fff; border:1px solid #e0e0e0; border-radius:4px;
+  padding:36px 24px; text-align:center; margin-top:20px;
+}
+.score-card.show { display:block; }
+.score-ring {
+  width:84px; height:84px; border-radius:50%; background:#6264a7; color:#fff;
+  font-size:1.5rem; font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 14px;
+}
+.score-title { font-size:1.15rem; font-weight:600; margin-bottom:5px; }
+.score-msg   { color:#555; font-size:.88rem; margin-bottom:22px; }
+.score-stats { display:flex; justify-content:center; gap:28px; margin-bottom:22px; }
+.sstat-val   { font-size:1.35rem; font-weight:600; }
+.sstat-val.g { color:#107c10; }
+.sstat-val.r { color:#d13438; }
+.sstat-lbl   { font-size:.73rem; color:#888; margin-top:1px; }
+
+/* ── Mobile ── */
+.mobile-nav-btn {
+  display:none; background:#6264a7; color:#fff; border:none; cursor:pointer;
+  padding:8px 14px; font-size:.85rem; font-family:inherit; font-weight:500;
+}
+@media(max-width:680px){
+  .sidebar { position:fixed; left:-260px; top:0; height:100vh; z-index:200; transition:left .2s; }
+  .sidebar.open { left:0; box-shadow:2px 0 12px rgba(0,0,0,.15); }
+  .mobile-nav-btn { display:block; }
+  .app-shell { flex-direction:column; }
+  .page-body { padding:16px 14px 60px; }
+  .header-inner { padding:18px 14px 0; }
+}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="app-shell">
+
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">ReWe Übungen</div>
+      <div class="sidebar-subtitle">Buchungssätze</div>
+    </div>
+
+    <div class="nav-section-label">Übungen</div>
+
+    <div class="nav-item active" id="nav-0" onclick="switchExercise(0)">
+      <div class="nav-item-icon">2.4.1</div>
+      <div>
+        <div class="nav-item-label">Anlagenkauf &amp; Abschreibung</div>
+        <div class="nav-item-sub">Empfangspult &amp; Elektrostapler</div>
+      </div>
+    </div>
+    <div class="nav-progress" id="navprog-0">
+      <div class="nav-prog-bar"><div class="nav-prog-fill" id="npf-0" style="width:0%"></div></div>
+      <span id="npt-0">0 / 12</span>
+    </div>
+
+    <div class="nav-item" id="nav-1" onclick="switchExercise(1)">
+      <div class="nav-item-icon">2.4.2</div>
+      <div>
+        <div class="nav-item-label">Anlagen in Bau &amp; selbst erstellt</div>
+        <div class="nav-item-sub">Reparaturhalle &amp; PV-Anlage</div>
+      </div>
+    </div>
+    <div class="nav-progress" id="navprog-1">
+      <div class="nav-prog-bar"><div class="nav-prog-fill" id="npf-1" style="width:0%"></div></div>
+      <span id="npt-1">0 / 14</span>
+    </div>
+  </nav>
+
+  <!-- ── Main ── -->
+  <div class="main-area" id="main-area">
+    <div class="page-header">
+      <div class="header-inner">
+        <button class="mobile-nav-btn" onclick="toggleSidebar()">☰ Übungen</button>
+        <div class="header-title" id="hdr-title"></div>
+        <div class="header-sub">
+          Buchungssätze als einzeilige Eingabe mit EUR-Angabe:<br>
+          <code>1234 1234,56 EUR / 1234 1234,56 EUR</code>
+          &nbsp;– mehrere Konten je Seite mit Leerzeichen trennen.
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    </div>
+
+    <div class="page-body" id="page-body">
+      <div class="score-card" id="score">
+        <div class="score-ring" id="sc-pct">–</div>
+        <div class="score-title">Übung abgeschlossen!</div>
+        <div class="score-msg" id="sc-msg"></div>
+        <div class="score-stats">
+          <div><div class="sstat-val g" id="sc-ok">0</div><div class="sstat-lbl">Richtig</div></div>
+          <div><div class="sstat-val r" id="sc-wr">0</div><div class="sstat-lbl">Falsch</div></div>
+          <div><div class="sstat-val"   id="sc-to">0</div><div class="sstat-lbl">Gesamt</div></div>
+        </div>
+        <button class="btn btn-primary" onclick="restart()">Nochmal versuchen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  ÜBUNGS-DATENBANK
+//  Struktur: EXERCISES = [ { title, questions:[...] }, ... ]
+//
+//  Fragetypen:
+//    "buchung"  — einzeilige Buchungssatz-Eingabe
+//    "mc"       — Multiple Choice (eine richtige)
+//    "mc_multi" — Buchungssatz aus Optionsliste wählen
+//    "number"   — Zahleneingabe
+//
+//  Buchungssatz-Antwort: { soll:[{k,b},...], haben:[{k,b},...] }
+//  Betrag b immer ohne EUR (wird intern verglichen).
+// ═══════════════════════════════════════════════════════════════
+const EXERCISES = [
+
+// ──────────────────────────────────────────────────────────────
+// ÜBUNG 2.4.1 – Anlagenkauf & Abschreibung
+// ──────────────────────────────────────────────────────────────
+{
+  title: "Übung 2.4.1 – Anlagenkauf & Abschreibung",
+  questions: [
+
+    // ── Empfangspult ─────────────────────────────
+    {
+      id:"E392", gruppe:"Empfangspult – Anschaffung & Abschreibung",
+      type:"buchung", date:"5.9.2024", beleg:"E392",
+      text:"Kauf eines Empfangspults von der Speigner GmbH (Lieferant 33104)\n1.600,00 EUR + 320,00 EUR USt = 1.920,00 EUR, zahlbar sofort nach Rechnungserhalt.\n\nBuchungssatz E392:",
+      answer:{ soll:[{k:"0600",b:"1600,00"},{k:"2500",b:"320,00"}], haben:[{k:"33104",b:"1920,00"}] }
+    },
+    {
+      id:"U23a", gruppe:"Empfangspult – Anschaffung & Abschreibung",
+      type:"buchung", date:"31.12.2024", beleg:"U23",
+      text:"Das Empfangspult wurde am 5.9.2024 in Betrieb genommen.\nGeplante Nutzungsdauer: 6 Jahre auf Erinnerungs-Euro.\n\nBuchungssatz U23 – Abschreibung Empfangspult Ende 2024:",
+      answer:{ soll:[{k:"7010",b:"88,89"}], haben:[{k:"0600",b:"88,89"}] }
+    },
+    {
+      id:"erg_pult", gruppe:"Empfangspult – Anschaffung & Abschreibung",
+      type:"mc", date:null, beleg:null,
+      text:"Welche Erfolgsauswirkung hat die Abschreibung des Empfangspultes?",
+      options:["gewinnerhöhend","gewinnmindernd","gewinnneutral"],
+      answer:"gewinnmindernd"
+    },
+    {
+      id:"U23b", gruppe:"Empfangspult – Anschaffung & Abschreibung",
+      type:"buchung", date:"31.12.2030", beleg:"U23",
+      text:"Anschaffung: 1.600,00 + 320,00 USt = 1.920,00 EUR | Inbetriebnahme: 5.9.2024 | Nutzungsdauer: 6 Jahre auf Erinnerungs-Euro.\n\nBuchungssatz U23 – Abschreibung Empfangspult Ende 2030:",
+      answer:{ soll:[{k:"7010",b:"177,67"}], haben:[{k:"0600",b:"177,67"}] }
+    },
+
+    // ── Elektrostapler ────────────────────────────
+    {
+      id:"E745", gruppe:"Elektro-Stapler – Anschaffung & Abschreibung",
+      type:"buchung", date:"6.9.2024", beleg:"E745",
+      text:"Kauf eines Elektro-Staplers von der Claudia Wallner GmbH (Lieferant 33180)\n10.300,00 EUR + 2.060,00 EUR USt = 12.360,00 EUR\nZahlung: innerhalb 14 Tagen 3 % Skonto, innerhalb 60 Tagen ohne Abzug.\n(Elektrostapler → Konto 0400 Maschinen)\n\nBuchungssatz E745:",
+      answer:{ soll:[{k:"0400",b:"10300,00"},{k:"2500",b:"2060,00"}], haben:[{k:"33180",b:"12360,00"}] }
+    },
+    {
+      id:"erg_e745", gruppe:"Elektro-Stapler – Anschaffung & Abschreibung",
+      type:"mc", date:null, beleg:null,
+      text:"Welche Erfolgsauswirkung hat der Kauf des Elektrostaplers (E745)?",
+      options:["gewinnerhöhend","gewinnmindernd","gewinnneutral"],
+      answer:"gewinnneutral"
+    },
+    {
+      id:"E768", gruppe:"Elektro-Stapler – Anschaffung & Abschreibung",
+      type:"buchung", date:"13.9.2024", beleg:"E768",
+      text:"Spedition Dietrich & Dietrich GmbH (Lieferant 33550) – Anlieferung des Elektrostaplers:\n179,00 EUR + 35,80 EUR USt = 214,80 EUR; zahlbar innerhalb 10 Tagen ohne Abzug.\n\nBuchungssatz E768:",
+      answer:{ soll:[{k:"0400",b:"179,00"},{k:"2500",b:"35,80"}], haben:[{k:"33550",b:"214,80"}] }
+    },
+    {
+      id:"erg_e768", gruppe:"Elektro-Stapler – Anschaffung & Abschreibung",
+      type:"mc", date:null, beleg:null,
+      text:"Welche Erfolgsauswirkung hat die Buchung der Transportkosten (E768)?",
+      options:["gewinnerhöhend","gewinnmindernd","gewinnneutral"],
+      answer:"gewinnneutral"
+    },
+    {
+      id:"B148", gruppe:"Elektro-Stapler – Anschaffung & Abschreibung",
+      type:"mc_multi", date:"20.9.2024", beleg:"B148",
+      text:"Zahlung der Rechnung E745 mit Skontoabzug:\nÜberweisung 11.989,20 EUR (12.360,00 − 3 % = 370,80 Skonto; davon 61,80 EUR Vorsteuerkorrektur, 309,00 EUR Netto-Skonto auf Konto 0400).\n\nWelcher Buchungssatz ist korrekt?",
+      options:[
+        "33180 12360,00 EUR / 2800 11989,20 EUR  0400 309,00 EUR  2500 61,80 EUR",
+        "33180 12360,00 EUR / 0400 309,00 EUR  2500 61,80 EUR  2800 11989,20 EUR",
+        "33180 12360,00 EUR / 2800 11989,20 EUR  2500 61,80 EUR  0400 309,00 EUR",
+        "33180 12360,00 EUR / 2500 61,80 EUR  0400 309,00 EUR  2800 11989,20 EUR",
+        "33180 12360,00 EUR / 2500 61,80 EUR  2800 11989,20 EUR  0400 309,00 EUR",
+        "33180 12360,00 EUR / 0400 309,00 EUR  2800 11989,20 EUR  2500 61,80 EUR",
+      ],
+      answer:"33180 12360,00 EUR / 2800 11989,20 EUR  0400 309,00 EUR  2500 61,80 EUR"
+    },
+    {
+      id:"aktiv", gruppe:"Elektro-Stapler – Anschaffung & Abschreibung",
+      type:"number", date:null, beleg:null,
+      text:"Wie hoch ist der aktivierungspflichtige Wert des Elektro-Staplers (vor Abschreibung)?\n(Anschaffungspreis netto + Transportkosten netto)\n\nAngabe: 2 Dezimalstellen, Komma als Trennzeichen, ohne Währungsangabe.",
+      answer:"10479,00", hint:"10.300,00 + 179,00 = ?"
+    },
+    {
+      id:"afa24", gruppe:"Elektro-Stapler – Anschaffung & Abschreibung",
+      type:"number", date:"31.12.2024", beleg:null,
+      text:"Inbetriebnahme: 20.9.2024 | Linear über 8 Jahre auf Erinnerungs-Euro.\n\nWie hoch ist die Abschreibung 2024 (Anschaffungsjahr)?\n\nAngabe: 2 Dezimalstellen, Komma als Trennzeichen, ohne Währungsangabe.",
+      answer:"635,63", hint:"Aktivwert / 8 = Jahres-AfA → anteilig 3,5 Monate"
+    },
+    {
+      id:"U23c", gruppe:"Elektro-Stapler – Anschaffung & Abschreibung",
+      type:"buchung", date:"31.12.2025", beleg:"U23",
+      text:"Abschreibung Elektrostapler 2025.\nInbetriebnahme: 20.9.2024 | Linear 8 Jahre auf Erinnerungs-Euro.\n\nBuchungssatz U23 – Abschreibung Elektrostapler 2025:",
+      answer:{ soll:[{k:"7010",b:"1271,25"}], haben:[{k:"0400",b:"1271,25"}] }
+    },
+    {
+      id:"U23d", gruppe:"Elektro-Stapler – Anschaffung & Abschreibung",
+      type:"buchung", date:"31.12.2032", beleg:"U23",
+      text:"Abschreibung Elektrostapler 2032 (letztes Abschreibungsjahr).\nInbetriebnahme: 20.9.2024 | Linear 8 Jahre auf Erinnerungs-Euro.\n\nBuchungssatz U23 – Abschreibung Elektrostapler 2032:",
+      answer:{ soll:[{k:"7010",b:"634,63"}], haben:[{k:"0400",b:"634,63"}] }
+    },
+  ]
+},
+
+// ──────────────────────────────────────────────────────────────
+// ÜBUNG 2.4.2 – Anlagen in Bau & selbst erstellt
+// ──────────────────────────────────────────────────────────────
+{
+  title: "Übung 2.4.2 – Anlagen in Bau & selbst erstellt",
+  questions: [
+
+    // ── Reparaturhalle ────────────────────────────
+    {
+      id:"E951", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"buchung", date:"16.8.2021", beleg:"E951",
+      text:"Karl Bauer GmbH – Bau einer Reparaturhalle.\n1. Teilrechnung vom Baumeister Peter Bruck OG (Lieferant 33998):\n40.000,00 EUR + 8.000,00 EUR USt = 48.000,00 EUR\n\nBuchungssatz E951:",
+      answer:{ soll:[{k:"0710",b:"40000,00"},{k:"2500",b:"8000,00"}], haben:[{k:"33998",b:"48000,00"}] }
+    },
+    {
+      id:"E1482", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"buchung", date:"21.12.2021", beleg:"E1482",
+      text:"Karl Bauer GmbH – Bau einer Reparaturhalle.\n2. Teilrechnung vom Baumeister Peter Bruck OG (Lieferant 33998):\n70.000,00 EUR + 14.000,00 EUR USt = 84.000,00 EUR\n\nBuchungssatz E1482:",
+      answer:{ soll:[{k:"0710",b:"70000,00"},{k:"2500",b:"14000,00"}], haben:[{k:"33998",b:"84000,00"}] }
+    },
+    {
+      id:"B899", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"buchung", date:"21.12.2021", beleg:"B899",
+      text:"Die Karl Bauer GmbH bezahlt die offene Rechnung E1482 durch Überweisung vom Bankkonto an Baumeister Peter Bruck OG (Lieferant 33998).\n\nBuchungssatz B899:",
+      answer:{ soll:[{k:"33998",b:"84000,00"}], haben:[{k:"2800",b:"84000,00"}] }
+    },
+    {
+      id:"E734", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"buchung", date:"20.6.2022", beleg:"E734",
+      text:"Im Jahr 2022 wird die Halle weitergebaut und fertiggestellt.\n3. Teilrechnung vom Baumeister Peter Bruck OG (Lieferant 33998):\n50.000,00 EUR + 10.000,00 EUR USt = 60.000,00 EUR\n\nBuchungssatz E734:",
+      answer:{ soll:[{k:"0710",b:"50000,00"},{k:"2500",b:"10000,00"}], haben:[{k:"33998",b:"60000,00"}] }
+    },
+    {
+      id:"erg_e951", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"mc", date:null, beleg:null,
+      text:"Wie lautet die Erfolgsauswirkung der Buchung E951?",
+      options:["erhöht Erfolg (Gewinn)","vermindert Erfolg (Gewinn)","erfolgsneutral"],
+      answer:"erfolgsneutral"
+    },
+    {
+      id:"E1160", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"buchung", date:"27.9.2022", beleg:"E1160",
+      text:"Endabrechnung vom Baumeister Peter Bruck OG (Lieferant 33998):\n\nReparaturhalle laut Plan:          324.000,00 EUR\n− Teilrechnungen (160.000,00 EUR)\nOffener Betrag:                       164.000,00 EUR\n+ 20 % USt:                             32.800,00 EUR\nRestbetrag:                           196.800,00 EUR\n\nBuchungssatz E1160:",
+      answer:{ soll:[{k:"0710",b:"164000,00"},{k:"2500",b:"32800,00"}], haben:[{k:"33998",b:"196800,00"}] }
+    },
+    {
+      id:"B121", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"buchung", date:"27.9.2022", beleg:"B121",
+      text:"Die Karl Bauer GmbH bezahlt den offenen Restbetrag aus E1160 durch Überweisung vom Bankkonto an Baumeister Peter Bruck OG (Lieferant 33998).\n\nBuchungssatz B121:",
+      answer:{ soll:[{k:"33998",b:"196800,00"}], haben:[{k:"2800",b:"196800,00"}] }
+    },
+    {
+      id:"U25", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"buchung", date:"27.9.2022", beleg:"U25",
+      text:"Die Reparaturhalle wurde am 21.9.2022 in Betrieb genommen.\nGesamtkosten laut Endabrechnung: 324.000,00 EUR\n\nBuchungssatz U25 – Umbuchung Anlage in Bau auf Gebäude (Konto 0300):",
+      answer:{ soll:[{k:"0300",b:"324000,00"}], haben:[{k:"0710",b:"324000,00"}] }
+    },
+    {
+      id:"erg_u25", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"mc", date:null, beleg:null,
+      text:"Wie lautet die Erfolgsauswirkung der Umbuchung U25?",
+      options:["erhöht Erfolg (Gewinn)","vermindert Erfolg (Gewinn)","erfolgsneutral"],
+      answer:"erfolgsneutral"
+    },
+    {
+      id:"U44", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"buchung", date:"31.12.2022", beleg:"U44",
+      text:"Inbetriebnahme: 21.9.2022 | Nutzungsdauer: 40 Jahre | Lineare Abschreibung\nAnschaffungswert: 324.000,00 EUR\n\nBuchungssatz U44 – Abschreibung Reparaturhalle Ende 2022:",
+      answer:{ soll:[{k:"7010",b:"4050,00"}], haben:[{k:"0300",b:"4050,00"}] }
+    },
+    {
+      id:"erg_u44", gruppe:"Reparaturhalle – Anlagen in Bau",
+      type:"mc", date:null, beleg:null,
+      text:"Wie lautet die Erfolgsauswirkung der Abschreibung U44?",
+      options:["erhöht Erfolg (Gewinn)","vermindert Erfolg (Gewinn)","erfolgsneutral"],
+      answer:"vermindert Erfolg (Gewinn)"
+    },
+
+    // ── PV-Anlage ─────────────────────────────────
+    {
+      id:"U7", gruppe:"PV-Anlage – selbst erstellt",
+      type:"buchung", date:"3.4.", beleg:"U7",
+      text:"Daniel Bichler e.U. – Produzent von Photovoltaikanlagen.\nIm eigenen Betrieb erzeugte PV-Module zur Stromerzeugung für Produktionsanlagen.\nInbetriebnahme: 3. April | Herstellungskosten: 125.000,00 EUR\nKonto: 0450 Sonstige Betriebsanlagen\n\nBuchungssatz U7 – Erfassung der selbst erstellten PV-Anlage:",
+      answer:{ soll:[{k:"0450",b:"125000,00"}], haben:[{k:"4580",b:"125000,00"}] }
+    },
+    {
+      id:"erg_u7", gruppe:"PV-Anlage – selbst erstellt",
+      type:"mc", date:null, beleg:null,
+      text:"Wie lautet die Erfolgsauswirkung der Buchung U7?",
+      options:["erhöht Erfolg (Gewinn)","vermindert Erfolg (Gewinn)","erfolgsneutral"],
+      answer:"erhöht Erfolg (Gewinn)"
+    },
+    {
+      id:"U28", gruppe:"PV-Anlage – selbst erstellt",
+      type:"buchung", date:"31.12.", beleg:"U28",
+      text:"Daniel Bichler e.U. – PV-Anlage, Herstellungskosten 125.000,00 EUR.\nInbetriebnahme: 3. April | Nutzungsdauer: 20 Jahre | Lineare Abschreibung\n\nBuchungssatz U28 – Abschreibung PV-Anlage im ersten Nutzungsjahr:",
+      answer:{ soll:[{k:"7010",b:"6250,00"}], haben:[{k:"0450",b:"6250,00"}] }
+    },
+    {
+      id:"erg_u28", gruppe:"PV-Anlage – selbst erstellt",
+      type:"mc", date:null, beleg:null,
+      text:"Wie lautet die Erfolgswirksamkeit der Abschreibung U28?",
+      options:["gewinnerhöhend","gewinnneutral","gewinnmindernd"],
+      answer:"gewinnmindernd"
+    },
+  ]
+}
+
+]; // END EXERCISES
+// ═══════════════════════════════════════════════════════════════
+
+// ── State ────────────────────────────────────────────────────
+let activeEx = 0;
+// results[exIdx][qIdx] = null | true | false
+const results = EXERCISES.map(e => new Array(e.questions.length).fill(null));
+// saved[exIdx][qIdx] = string
+const saved   = EXERCISES.map(e => new Array(e.questions.length).fill(''));
+
+// ── Helpers ─────────────────────────────────────────────────
+function normB(s) {
+  if (!s) return '';
+  return parseFloat(s.toString().trim().replace(/\s/g,'').replace(',','.') || 0)
+         .toFixed(2).replace('.',',');
+}
+function normS(s) { return s.toString().trim().toLowerCase(); }
+function esc(s)   { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+// Parse "0600 1600,00 EUR 2500 320,00 EUR / 33104 1920,00 EUR"
+// Each side: pairs of (konto, betrag) where betrag ends with EUR
+function parseLine(line) {
+  const parts = line.split('/');
+  if (parts.length !== 2) return null;
+  const parseTokens = str => {
+    // Tokenise and find konto+betrag pairs
+    // Expected pattern: KONTO BETRAG EUR  KONTO BETRAG EUR ...
+    const tok = str.trim().split(/\s+/);
+    const res = [];
+    let i = 0;
+    while (i < tok.length) {
+      const konto = tok[i];
+      if (i + 1 >= tok.length) break;
+      let betrag = tok[i+1];
+      // Next token might be "EUR" — skip it
+      let skip = 2;
+      if (i + 2 < tok.length && tok[i+2].toUpperCase() === 'EUR') skip = 3;
+      res.push({ k: konto.trim(), b: betrag.trim() });
+      i += skip;
+    }
+    return res;
+  };
+  return { soll: parseTokens(parts[0]), haben: parseTokens(parts[1]) };
+}
+
+function normSide(arr) {
+  return arr.map(e => `${e.k}|${normB(e.b)}`).join('§');
+}
+
+function checkBuchungLine(line, q) {
+  if (!line.includes('/')) return false;
+  const p = parseLine(line);
+  if (!p || !p.soll.length || !p.haben.length) return false;
+  return normSide(p.soll)  === normSide(q.answer.soll) &&
+         normSide(p.haben) === normSide(q.answer.haben);
+}
+
+function buchungStr(ans) {
+  const s = ans.soll.map(e => `${e.k} ${e.b} EUR`).join('  ');
+  const h = ans.haben.map(e => `${e.k} ${e.b} EUR`).join('  ');
+  return `${s} / ${h}`;
+}
+
+function activeIdx() {
+  const r = results[activeEx];
+  const i = r.findIndex(x => x === null);
+  return i === -1 ? r.length : i;
+}
+
+// ── Switch exercise ─────────────────────────────────────────
+function switchExercise(idx) {
+  activeEx = idx;
+  document.querySelectorAll('.nav-item').forEach((el,i) => {
+    el.classList.toggle('active', i === idx);
+  });
+  document.getElementById('hdr-title').textContent = EXERCISES[idx].title;
+  render();
+  document.getElementById('main-area').scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ── Update sidebar progress ─────────────────────────────────
+function updateSidebarProgress() {
+  EXERCISES.forEach((ex, i) => {
+    const done  = results[i].filter(r => r !== null).length;
+    const total = ex.questions.length;
+    const pct   = total ? (done / total * 100) : 0;
+    document.getElementById(`npf-${i}`).style.width = pct + '%';
+    document.getElementById(`npt-${i}`).textContent = `${done} / ${total}`;
+  });
+}
+
+// ── Render ──────────────────────────────────────────────────
+function render() {
+  const ex     = EXERCISES[activeEx];
+  const qs     = ex.questions;
+  const res    = results[activeEx];
+  const sv     = saved[activeEx];
+  const active = activeIdx();
+  const done   = res.filter(r => r !== null).length;
+
+  document.getElementById('prog').style.width = (done / qs.length * 100) + '%';
+  updateSidebarProgress();
+
+  const body  = document.getElementById('page-body');
+  const score = document.getElementById('score');
+  body.querySelectorAll('.section-label,.q-card').forEach(el => el.remove());
+  score.classList.remove('show');
+
+  let lastGroup = null;
+
+  qs.forEach((q, i) => {
+    // Section label
+    if (q.gruppe !== lastGroup) {
+      const lbl = document.createElement('div');
+      lbl.className = 'section-label';
+      lbl.textContent = q.gruppe;
+      body.insertBefore(lbl, score);
+      lastGroup = q.gruppe;
+    }
+
+    const card = document.createElement('div');
+    const isAct = i === active;
+    card.className = 'q-card' +
+      (isAct ? ' active' : '') +
+      (res[i] === true  ? ' ok'    : '') +
+      (res[i] === false ? ' wrong' : '');
+    card.id = `c${i}`;
+
+    const icon = res[i] === true ? '✓' : res[i] === false ? '✗' : (i+1);
+
+    // Input HTML
+    let inputHTML = '';
+    if (res[i] === null && isAct) {
+      const sv_val = sv[i] || '';
+      if (q.type === 'buchung') {
+        inputHTML = `
+          <div class="input-wrap">
+            <div class="input-hint">Format: <code>Konto Betrag EUR / Konto Betrag EUR</code></div>
+            <input class="line-input" id="inp${i}" value="${esc(sv_val)}"
+              autocomplete="off" spellcheck="false">
+          </div>`;
+      } else if (q.type === 'mc' || q.type === 'mc_multi') {
+        const mono = q.type === 'mc_multi' ? ' mono' : '';
+        inputHTML = `<div class="mc-list${mono}" id="ml${i}">` +
+          q.options.map((opt, oi) => `
+            <label class="mc-opt${sv_val === opt ? ' sel' : ''}" id="mo${i}_${oi}">
+              <input type="radio" name="r${i}" value="${esc(opt)}"
+                ${sv_val === opt ? 'checked' : ''}
+                onchange="pickMC(${i}, this.value)">
+              <span>${opt}</span>
+            </label>`).join('') +
+        `</div>`;
+      } else if (q.type === 'number') {
+        inputHTML = `
+          <div class="input-wrap">
+            <input class="num-input" id="inp${i}" value="${esc(sv_val)}"
+              placeholder="Betrag …" autocomplete="off">
+            ${q.hint ? `<div class="num-hint">💡 ${q.hint}</div>` : ''}
+          </div>`;
+      }
+    } else if (res[i] !== null) {
+      const userVal = sv[i] || '';
+      if (q.type === 'buchung') {
+        inputHTML = `<div class="input-wrap"><input class="line-input" value="${esc(userVal)}" disabled></div>`;
+      } else if (q.type === 'number') {
+        inputHTML = `<div class="input-wrap"><input class="num-input" value="${esc(userVal)}" disabled></div>`;
+      } else {
+        const mono = q.type === 'mc_multi' ? ' mono' : '';
+        inputHTML = `<div class="mc-list${mono}">` +
+          q.options.map(opt => {
+            const isOk    = opt === q.answer;
+            const isWrong = opt === userVal && !isOk;
+            return `<label class="mc-opt${isOk ? ' reveal-ok' : isWrong ? ' reveal-wrong' : ''}">
+              <input type="radio" disabled ${opt === userVal ? 'checked' : ''}>
+              <span>${opt}</span>
+            </label>`;
+          }).join('') +
+        `</div>`;
+      }
+    } else {
+      inputHTML = `<div class="locked-note">Wird freigeschaltet, sobald die vorherige Frage beantwortet wurde.</div>`;
+    }
+
+    // Feedback
+    let fbHTML = '';
+    if (res[i] !== null) {
+      if (res[i]) {
+        fbHTML = `<div class="feedback ok show">✓ Richtig!</div>`;
+      } else {
+        const ans = q.type === 'buchung' ? buchungStr(q.answer) : q.answer;
+        fbHTML = `<div class="feedback err show">✗ Falsch.
+          <div class="feedback-correct">Richtige Antwort: ${ans}</div></div>`;
+      }
+    }
+
+    // Action button
+    const btnHTML = (res[i] === null && isAct)
+      ? `<div class="q-actions"><button class="btn btn-primary" onclick="submit(${i})">Antwort prüfen</button></div>`
+      : '';
+
+    const metaHTML = [
+      q.beleg ? `<span class="q-beleg">Beleg: ${q.beleg}</span>` : '',
+      q.date  ? `<span class="q-date">${q.date}</span>` : ''
+    ].filter(Boolean).join('');
+
+    card.innerHTML = `
+      <div class="q-top">
+        <div class="q-num">${icon}</div>
+        <div class="q-body">
+          ${metaHTML ? `<div class="q-meta">${metaHTML}</div>` : ''}
+          <div class="q-text">${q.text.replace(/\n/g,'<br>')}</div>
+          ${inputHTML}
+          ${fbHTML}
+          ${btnHTML}
+        </div>
+      </div>`;
+
+    body.insertBefore(card, score);
+  });
+
+  if (active >= qs.length) showScore();
+
+  setTimeout(() => {
+    const inp = document.getElementById(`inp${active}`);
+    if (inp) inp.focus();
+    const c = document.getElementById(`c${active}`);
+    if (c) c.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 80);
+}
+
+// ── MC pick ─────────────────────────────────────────────────
+function pickMC(i, val) {
+  saved[activeEx][i] = val;
+  document.querySelectorAll(`#ml${i} .mc-opt`).forEach(el => el.classList.remove('sel'));
+  const sel = document.querySelector(`input[name="r${i}"][value="${CSS.escape(val)}"]`);
+  if (sel) sel.closest('.mc-opt').classList.add('sel');
+}
+
+// ── Submit ───────────────────────────────────────────────────
+function submit(i) {
+  const q   = EXERCISES[activeEx].questions[i];
+  let val = '', ok = false;
+
+  if (q.type === 'buchung') {
+    val = (document.getElementById(`inp${i}`)?.value || '').trim();
+    if (!val) return;
+    ok = checkBuchungLine(val, q);
+  } else if (q.type === 'mc' || q.type === 'mc_multi') {
+    const sel = document.querySelector(`input[name="r${i}"]:checked`);
+    val = sel ? sel.value : (saved[activeEx][i] || '');
+    if (!val) return;
+    ok = normS(val) === normS(q.answer);
+  } else if (q.type === 'number') {
+    val = (document.getElementById(`inp${i}`)?.value || '').trim();
+    if (!val) return;
+    ok = normB(val) === normB(q.answer);
+  }
+
+  saved[activeEx][i]   = val;
+  results[activeEx][i] = ok;
+  render();
+}
+
+// ── Score ────────────────────────────────────────────────────
+function showScore() {
+  const res = results[activeEx];
+  const ok  = res.filter(r => r === true).length;
+  const bad = res.filter(r => r === false).length;
+  const tot = EXERCISES[activeEx].questions.length;
+  const pct = Math.round(ok / tot * 100);
+  const sc  = document.getElementById('score');
+  sc.classList.add('show');
+  document.getElementById('sc-pct').textContent = pct + '%';
+  document.getElementById('sc-ok').textContent  = ok;
+  document.getElementById('sc-wr').textContent  = bad;
+  document.getElementById('sc-to').textContent  = tot;
+  document.getElementById('sc-msg').textContent =
+    pct === 100 ? 'Perfekt! Alle Fragen richtig.' :
+    pct >= 70   ? 'Gut gemacht! Überprüfe die markierten Fehler.' :
+                  'Weiter üben! Die richtigen Antworten sind eingeblendet.';
+  sc.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function restart() {
+  results[activeEx] = new Array(EXERCISES[activeEx].questions.length).fill(null);
+  saved[activeEx]   = new Array(EXERCISES[activeEx].questions.length).fill('');
+  document.getElementById('main-area').scrollTo({ top:0, behavior:'smooth' });
+  render();
+}
+
+// ── Mobile sidebar ───────────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const sb = document.getElementById('sidebar');
+  if (sb.classList.contains('open') && !sb.contains(e.target) && !e.target.closest('.mobile-nav-btn')) {
+    sb.classList.remove('open');
+  }
+});
+
+// ── Enter key ────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+  const i = activeIdx();
+  const q = EXERCISES[activeEx].questions[i];
+  if (q && (q.type === 'buchung' || q.type === 'number')) submit(i);
+});
+
+// ── Init ─────────────────────────────────────────────────────
+document.getElementById('hdr-title').textContent = EXERCISES[0].title;
+render();
+</script>
+</body>
+</html>
