@@ -237,6 +237,18 @@ body {
     <div class="nav-prog-bar"><div class="nav-prog-fill" id="npf-1" style="width:0%"></div></div>
     <span id="npt-1">0 / …</span>
   </div>
+
+  <div class="nav-item" id="nav-2" onclick="switchExercise(2)">
+    <div class="nav-item-icon">2.4.5</div>
+    <div>
+      <div class="nav-item-label">Anlagegüter ausscheiden</div>
+      <div class="nav-item-sub">Computerkasse &amp; LKW-Verkauf</div>
+    </div>
+  </div>
+  <div class="nav-progress">
+    <div class="nav-prog-bar"><div class="nav-prog-fill" id="npf-2" style="width:0%"></div></div>
+    <span id="npt-2">0 / …</span>
+  </div>
 </nav>
 
 <!-- ── Main area ── -->
@@ -499,6 +511,129 @@ const EXERCISES = [
       text:"Wie lautet die Erfolgswirksamkeit der Abschreibung U28?",
       options:["gewinnerhöhend","gewinnneutral","gewinnmindernd"],
       answer:"gewinnmindernd"
+    },
+  ]
+}
+
+,
+
+// ──────────────────────────────────────────────────────────────
+// ÜBUNG 2.4.5 – Anlagegüter ausscheiden: Verkauf
+// ──────────────────────────────────────────────────────────────
+{
+  title:"Übung 2.4.5 – Anlagegüter ausscheiden: Verkauf",
+  questions:[
+
+    // ── Computerkasse ─────────────────────────────────────────
+    {
+      id:"A1540", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"buchung", date:"15.5.", beleg:"A1540",
+      text:"RR Biking GmbH verkauft über WillHaben eine gebrauchte Computerkasse um 1.500,00 EUR inkl. 20 % MWSt.\nKäufer: R3 – Reduce-Recycle-Reuse GmbH (Kundennummer 20222)\nZahlungsbedingung: zahlbar innerhalb 14 Tagen ohne Abzug.\n\nBuchungssatz A1540:",
+      answer:{ soll:[{k:"20222",b:"1500,00"}], haben:[{k:"4600",b:"1250,00"},{k:"3500",b:"250,00"}] }
+    },
+    {
+      id:"erg_A1540", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"mc", date:null, beleg:null,
+      text:"Wie ist die Erfolgsauswirkung der Buchung A1540?",
+      options:["erhöht Erfolg (Gewinn)","vermindert Erfolg (Gewinn)","erfolgsneutral"],
+      answer:"erhöht Erfolg (Gewinn)"
+    },
+    {
+      id:"B655", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"buchung", date:null, beleg:"B655",
+      text:"Auf dem Kontoauszug sehen wir den Zahlungseingang von A1540 in Höhe von 1.500,00 EUR von R3 – Reduce-Recycle-Reuse GmbH (Kundennummer 20222).\n\nBuchungssatz Bankbeleg B655:",
+      answer:{ soll:[{k:"2800",b:"1500,00"}], haben:[{k:"20222",b:"1500,00"}] }
+    },
+    {
+      id:"erg_B655", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"mc", date:null, beleg:null,
+      text:"Wie ist die Erfolgsauswirkung der Buchung B655?",
+      options:["erhöht Erfolg (Gewinn)","vermindert Erfolg (Gewinn)","erfolgsneutral"],
+      answer:"erfolgsneutral"
+    },
+    {
+      id:"U32", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"buchung", date:"31.12.", beleg:"U32",
+      text:"Am Ende des Jahres buchen wir die Abschreibung der im Mai verkauften Computerkasse, bevor wir sie ausbuchen.\nAnschaffungswert: 3.000,00 EUR | Nutzungsdauer: 8 Jahre | Buchwert per 1.1.: 1.125,00 EUR\n\nBuchungssatz U32 – Abschreibung Computerkasse:",
+      answer:{ soll:[{k:"7010",b:"187,50"}], haben:[{k:"0620",b:"187,50"}] }
+    },
+    {
+      id:"erg_U33", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"mc", date:null, beleg:null,
+      text:"Wie ist die Erfolgsauswirkung der Buchung U33 (Abschreibung Computerkasse)?",
+      options:["erhöht Erfolg (Gewinn)","vermindert Erfolg (Gewinn)","erfolgsneutral"],
+      answer:"vermindert Erfolg (Gewinn)"
+    },
+    {
+      id:"U34", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"buchung", date:"31.12.", beleg:"U34",
+      text:"Nach erfolgter Abschreibung buchen wir den Restwert der Computerkasse aus dem Anlagevermögen aus.\nRestwert nach Abschreibung: 1.125,00 − 187,50 = 937,50 EUR\n\nBuchungssatz U34 – Ausbuchen Restwert Computerkasse:",
+      answer:{ soll:[{k:"7820",b:"937,50"}], haben:[{k:"0620",b:"937,50"}] }
+    },
+    {
+      id:"erg_U34", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"mc", date:null, beleg:null,
+      text:"Wie ist die Erfolgsauswirkung der Buchung U34 (Ausbuchen Restwert)?",
+      options:["erhöht Erfolg (Gewinn)","vermindert Erfolg (Gewinn)","erfolgsneutral"],
+      answer:"vermindert Erfolg (Gewinn)"
+    },
+    {
+      id:"U35", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"buchung", date:"31.12.", beleg:"U35",
+      text:"Nach dem Ausbuchen buchen wir den Erlös aus dem Abgang der Computerkasse um.\n(Verkaufserlös netto 1.250,00 EUR > Buchwert 937,50 EUR → Gewinn aus Abgang)\n\nBuchungssatz U35 – Erlös aus Abgang umbuchen:",
+      answer:{ soll:[{k:"4600",b:"1250,00"}], haben:[{k:"4630",b:"1250,00"}] }
+    },
+    {
+      id:"erg_U35", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"mc", date:null, beleg:null,
+      text:"Wie ist die Erfolgsauswirkung der Buchung U35?",
+      options:["erhöht Erfolg (Gewinn)","vermindert Erfolg (Gewinn)","erfolgsneutral"],
+      answer:"erfolgsneutral"
+    },
+    {
+      id:"U36", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"buchung", date:"31.12.", beleg:"U36",
+      text:"Nun buchen wir den Buchwert abgegangener Anlagen auf Erträge aus dem Abgang von Anlagen um.\n\nBuchungssatz U36:",
+      answer:{ soll:[{k:"4630",b:"937,50"}], haben:[{k:"7820",b:"937,50"}] }
+    },
+    {
+      id:"erg_U36", gruppe:"Computerkasse – Verkauf & Ausscheiden",
+      type:"mc", date:null, beleg:null,
+      text:"Wie ist die Erfolgsauswirkung der Buchung U36?",
+      options:["erhöht Erfolg (Gewinn)","vermindert Erfolg (Gewinn)","erfolgsneutral"],
+      answer:"erfolgsneutral"
+    },
+
+    // ── LKW ──────────────────────────────────────────────────
+    {
+      id:"A1670", gruppe:"LKW – Verkauf & Ausscheiden",
+      type:"buchung", date:"29.5.", beleg:"A1670",
+      text:"Wir verkaufen den Firmen-LKW um 18.400,00 EUR + 3.680,00 EUR USt = 22.080,00 EUR an Ich-kauf-Dein-Auto AG – Barzahlung.\nRechnung A1670 mit Vermerk \"Betrag bar dankend erhalten\".\n\nBuchungssatz A1670:",
+      answer:{ soll:[{k:"2700",b:"22080,00"}], haben:[{k:"4600",b:"18400,00"},{k:"3500",b:"3680,00"}] }
+    },
+    {
+      id:"U37", gruppe:"LKW – Verkauf & Ausscheiden",
+      type:"buchung", date:"31.12.", beleg:"U37",
+      text:"Am Ende des Jahres buchen wir die Abschreibung des Ende Mai verkauften LKW, bevor wir den Restwert ausbuchen.\nAnschaffungswert: 88.600,00 EUR | Nutzungsdauer: 5 Jahre | Buchwert per 1.1.: 26.580,00 EUR\n\nBuchungssatz U37 – Abschreibung LKW:",
+      answer:{ soll:[{k:"7010",b:"8860,00"}], haben:[{k:"0640",b:"8860,00"}] }
+    },
+    {
+      id:"U38", gruppe:"LKW – Verkauf & Ausscheiden",
+      type:"buchung", date:"31.12.", beleg:"U38",
+      text:"Nach erfolgter Abschreibung buchen wir den LKW aus dem Anlagevermögen aus.\nRestwert nach Abschreibung: 26.580,00 − 8.860,00 = 17.720,00 EUR\n\nBuchungssatz U38 – Ausbuchen Restwert LKW:",
+      answer:{ soll:[{k:"7820",b:"17720,00"}], haben:[{k:"0640",b:"17720,00"}] }
+    },
+    {
+      id:"U39", gruppe:"LKW – Verkauf & Ausscheiden",
+      type:"buchung", date:"31.12.", beleg:"U39",
+      text:"Nach dem Ausbuchen des LKWs buchen wir den Erlös aus dem Abgang um.\n(Verkaufserlös netto 18.400,00 EUR > Buchwert 17.720,00 EUR → Gewinn aus Abgang)\n\nBuchungssatz U39 – Erlös aus Abgang LKW umbuchen:",
+      answer:{ soll:[{k:"4600",b:"18400,00"}], haben:[{k:"4630",b:"18400,00"}] }
+    },
+    {
+      id:"U40", gruppe:"LKW – Verkauf & Ausscheiden",
+      type:"buchung", date:"31.12.", beleg:"U40",
+      text:"Nun buchen wir den Buchwert abgegangener Anlagen auf Erträge aus dem Abgang von Anlagen um.\n\nBuchungssatz U40:",
+      answer:{ soll:[{k:"4630",b:"17720,00"}], haben:[{k:"7820",b:"17720,00"}] }
     },
   ]
 }
